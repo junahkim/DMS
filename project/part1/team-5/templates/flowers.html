@@ -18,13 +18,20 @@
     </form>
 
     <h3>Available Flowers</h3>
-    <ul id="flower-data">
+    <ul id="flower-data" onload="updateFlowers">
       {% if flowers %} {% for flower in flowers %}
       <li>{{ flower }}</li>
       {% endfor %} {% else %}
       <li>No flowers available.</li>
       {% endif %}
     </ul>
+
+    <form id="flower-water">
+      <input type="text" name="id" id="flower_id" placeholder="Flower Id" />
+      <input type="text" name="name" id="flower_name" placeholder="Flower name" />
+      <input type="text" name="water_level" id="flower_water" placeholder="How much water to add" />
+      <button type="submit">Update Flowers Water</button>
+    </form>
 
     <script>
       const flower_f = document.getElementById("flower_form");
@@ -34,25 +41,73 @@
         const water_level = document.getElementById("water_level");
         const min_water_required = document.getElementById("min_water_required");
         if (name.value && last_watered.value && water_level.value && min_water_required.value) {
-          fetch("/flowers")
-            .then((response) => response.json())
-            .then((data) => {
-              let rows = "";
-              data.forEach((flower) => {
-                rows += `<tr>
-                        <td>${flower.name}</td>
-                        <td>${flower.last_watered}</td>
-                        <td>${flower.water_level} inches</td>
-                        <td>${flower.needs_watering ? "Yes" : "No"}</td>
-                    </tr>`;
-              });
-              document.getElementById("flower-data").innerHTML = rows;
-            });
+          console.log("Flowers successfully gathered");
         } else {
           event.preventDefault();
           alert("Please enter all fields.");
         }
       });
+    </script>
+
+    <script>
+      const flower_w = document.getElementById("flower-water");
+      flower_w.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const flower_id = document.getElementById("flower_id").value;
+        const flower_n = document.getElementById("flower_name").value;
+        const water = document.getElementById("flower_water").value;
+
+        if (flower_id && flower_n && water) {
+          fetch(`/flowers/${flower_id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              last_watered: new Date().toISOString().split("T")[0],
+              water_level: water,
+              flower_id: flower_id,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              location.reload();
+            });
+        } else {
+          event.preventDefault();
+          alert("Please enter all fields");
+        }
+      });
+    </script>
+
+    <script>
+      function updateFlowers() {
+        fetch("/flowers")
+          .then((response) => response.json())
+          .then((flowers) => {
+            const today = new Date();
+            flowers.forEach;
+            (flower) => {
+              const last_watered_date = new Date(flower.last_watered);
+              if (today !== last_watered_date) {
+                const new_water_level = flower.water_level - 5 * (today - last_watered_date);
+              }
+
+              fetch(`/flowers/${flower_id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  last_watered: today.toISOString.split("T")[0],
+                  water_level: new_water_level,
+                })
+                  .then((response) => response.json())
+                  .then(() => {
+                    location.reload();
+                  }),
+              });
+            };
+          });
+      }
     </script>
   </body>
 </html>

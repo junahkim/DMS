@@ -1,7 +1,12 @@
+from dotenv import load_dotenv, dotenv_values
 import psycopg2
+import os
 
-# Neon PostgreSQL connection details
-DATABASE_URL = ""
+# Input the absolute path to the .env file
+load_dotenv()
+
+# AWS PostgreSQL connection
+DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_URI')}:5432/{os.getenv('DB_NAME')}"
 
 try:
     # Connect to PostgreSQL
